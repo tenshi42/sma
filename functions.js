@@ -1,5 +1,6 @@
 var canvasWidth = 600;
 var canvasHeight = 400;
+var distanceMax = Math.sqrt(canvasWidth * canvasWidth + canvasHeight * canvasHeight);
 var canvas = null;
 var ctx = null;
 var rate = 30;
@@ -20,6 +21,14 @@ class Animal {
     this.height = 35;
     this.img = new Image();
     this.img.src = image;
+  }
+
+  getPosX(){
+    return this.posX;
+  }
+
+  getPosY(){
+    return this.posY;
   }
 
   move(){
@@ -61,6 +70,38 @@ class Renard extends Animal{
   constructor(posX, posY){
     super(posX, posY, "images/renard_repro.png");
   }
+
+  detectRabbit(){
+    /* For each rabbit, we check if detection range > distance from rabbit.
+       If one of them is in range, the fox chases him until it catch it,
+       even if another one comes to be nearer.
+     */
+    /*
+      var a = x1 - x2;
+      var b = y1 - y2;
+
+      var c = Math.sqrt( a*a + b*b );
+     */
+    var distances = [];
+    var distanceMin = distanceMax +1;
+    var iMin = 0;
+
+    for (var i in lapins){
+      var a = lapins[i].getPosX() - this.posX;
+      var b = lapins[i].getPosY() - this.posY;
+
+      distances[i] = Math.sqrt(a*a + b*b);
+
+      if (distances[i] < distanceMin){
+        distanceMin = distances[i];
+        iMin = i;
+      }
+    }
+
+    // TODO : compare distanceMin and vision range
+  }
+
+
 }
 
 function addLapin() {
@@ -94,6 +135,7 @@ function move() {
 
   for(var i in renards){
     renards[i].move();
+    renards[i].detectRabbit();
   }
 }
 
