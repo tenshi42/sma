@@ -109,7 +109,11 @@ class Renard extends Animal{
     }
   }
 
-
+  /**
+   * Renard movement towards targeted Lapin
+   *
+   * @param i indice of Lapin in lapins[]
+   */
   chaseRabbit(i) {
     var xL = lapins[i].getPosX();
     var yL = lapins[i].getPosY();
