@@ -9,6 +9,7 @@ var lapinId = 0;
 var renardId = 0;
 var lapins = [];
 var renards = [];
+var visionRange = 300;
 
 class Animal {
   constructor(posX, posY, image) {
@@ -67,19 +68,22 @@ class Lapin extends Animal{
 }
 
 class Renard extends Animal{
-  constructor(posX, posY){
+  constructor(posX, posY, visionRange){
     super(posX, posY, "images/renard_repro.png");
+    // TODO : declare somewhere else ??
+    this.visionRange = visionRange;
   }
 
-  detectRabbit(){
-    /* For each rabbit, we check if detection range > distance from rabbit.
-       If one of them is in range, the fox chases him until it catch it,
-       even if another one comes to be nearer.
+    /**
+     * Get position of each rabbit,
+     * and returns nearest's indice.
+     *
+     * @returns {number}
      */
+  detectRabbit(){
     /*
       var a = x1 - x2;
       var b = y1 - y2;
-
       var c = Math.sqrt( a*a + b*b );
      */
     var distances = [];
@@ -98,9 +102,39 @@ class Renard extends Animal{
       }
     }
 
-    // TODO : compare distanceMin and vision range
+    if (distanceMin < this.visionRange){
+      return iMin;
+    } else {
+      return -1;
+    }
   }
 
+
+  chaseRabbit(i) {
+    var xL = lapins[i].getPosX();
+    var yL = lapins[i].getPosY();
+
+    if (xL < this.posX) {
+      this.dirX = -1;
+    } else if (xL > this.posX) {
+      this.dirX = 1;
+    } else {
+      // ??
+    }
+
+    if (yL < this.posY) {
+        this.dirY = -1;
+    } else if (yL > this.posY) {
+        this.dirY = 1;
+    } else {
+      // ??
+    }
+
+    // Max speed movement
+    this.posX += this.dirX;
+    this.posY += this.dirY;
+    // TODO : ad continuity ?
+  }
 
 }
 
@@ -113,7 +147,7 @@ function addLapin() {
 function addRenard() {
   var x = Math.floor(Math.random() * canvasWidth);
   var y = Math.floor(Math.random() * canvasHeight);
-  renards[renardId++] = new Renard(x, y);
+  renards[renardId++] = new Renard(x, y, visionRange);
 }
 
 function draw() {
@@ -129,13 +163,17 @@ function draw() {
 }
 
 function move() {
-  for(var i in lapins){
-    lapins[i].move();
+  for(var i in renards){
+    var y = renards[i].detectRabbit();
+    if (y > 0){
+      renards[i].chaseRabbit(y);
+    } else {
+      renards[i].move();
+    }
   }
 
-  for(var i in renards){
-    renards[i].move();
-    renards[i].detectRabbit();
+  for(var i in lapins){
+    lapins[i].move();
   }
 }
 
