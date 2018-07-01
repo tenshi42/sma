@@ -165,7 +165,7 @@ function draw() {
 function move() {
   for(var i in renards){
     var y = renards[i].detectRabbit();
-    if (y > 0){
+    if (y >= 0){
       renards[i].chaseRabbit(y);
     } else {
       renards[i].move();
