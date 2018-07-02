@@ -234,6 +234,7 @@ function move() {
   for(var i in lapins){
     lapins[i].move();
   }
+  die();
 }
 
 function die(){
