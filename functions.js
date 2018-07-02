@@ -198,7 +198,7 @@ function addLapin() {
   var x = Math.floor(Math.random() * canvasWidth);
   var y = Math.floor(Math.random() * canvasHeight);
   lapins[lapinId] = new Lapin(x, y, lapinId);
-  lapin++;
+  lapinId++;
 }
 
 function addRenard() {
@@ -223,8 +223,8 @@ function draw() {
 function move() {
   for(var i in renards){
     var y = renards[i].detectRabbit();
-    if (y >= 0){
-      renards[i].chaseRabbit(y);
+    if (y !== null){
+      renards[i].chaseRabbit(y[0]);
     } else {
       renards[i].move();
     }
