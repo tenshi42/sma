@@ -13,7 +13,7 @@ var reproductionDelay = 1;
 var frame = 0;
 var running = false;
 var visionRange = 300;
-var foxDieTime = 10 000;
+var foxDieTime = 10000;
 var foxtodie = [];
 
 var unsafeZone = {};
@@ -119,7 +119,7 @@ class Renard extends Animal{
     this.visionRange = visionRange;
     this.id = id;
     setTimeout(function(){
-      foxtodie[] = this.id;
+      foxtodie.push(this.id);
     }, dieTime);
   }
 
@@ -237,7 +237,8 @@ function move() {
 
 function die(){
   for(i=0;i<foxtodie.count;i++){
-    renards[i].
+    delete renards[];
+    renards[i]
   }
 }
 
