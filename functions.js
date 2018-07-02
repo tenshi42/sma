@@ -110,8 +110,8 @@ class Renard extends Animal{
    * @param i indice of Lapin in lapins[]
    */
   chaseRabbit(i) {
-    var xL = lapins[i].getPosX();
-    var yL = lapins[i].getPosY();
+    var xL = lapins[i].posX;
+    var yL = lapins[i].posY;
 
     if (xL < this.posX) {
       this.dirX = -1;
