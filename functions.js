@@ -141,8 +141,8 @@ class Renard extends Animal{
     var iMin = 0;
 
     for (var i in lapins){
-      var a = lapins[i].getPosX - this.posX;
-      var b = lapins[i].getPosY - this.posY;
+      var a = lapins[i].getPosX() - this.getPosX();
+      var b = lapins[i].getPosY() - this.getPosY();
 
       distances[i] = Math.sqrt(a*a + b*b);
 
@@ -224,7 +224,6 @@ function draw() {
 function move() {
   for(var i in renards){
     var y = renards[i].detectRabbit();
-    console.log(y);
     if (y !== null){
       renards[i].chaseRabbit(y[0]);
     } else {
