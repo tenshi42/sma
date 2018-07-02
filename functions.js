@@ -13,9 +13,12 @@ var reproductionDelay = 1;
 var frame = 0;
 var running = false;
 var visionRange = 300;
+var foxDieTime = 10 000;
+var foxtodie = [];
 
 class Animal {
-  constructor(posX, posY, image) {
+  constructor(posX, posY, image, id) {
+    this.id = id;
     this.posX = posX;
     this.posY = posY;
     this.dirX = 0;
@@ -71,10 +74,15 @@ class Lapin extends Animal{
 }
 
 class Renard extends Animal{
-  constructor(posX, posY, visionRange){
+  constructor(posX, posY, visionRange, id){
+    var dieTime= foxDieTime;
     super(posX, posY, "images/renard_repro.png");
     // TODO : declare somewhere else ??
     this.visionRange = visionRange;
+    this.id = id;
+    setTimeout(function(){
+      foxtodie[] = this.id;
+    }, dieTime);
   }
 
   /**
@@ -83,6 +91,7 @@ class Renard extends Animal{
    *
    * @returns {*}
    */
+
   detectRabbit(){
     /*
       var a = x1 - x2;
@@ -183,6 +192,12 @@ function move() {
 
   for(var i in lapins){
     lapins[i].move();
+  }
+}
+
+function die(){
+  for(i=0;i<foxtodie.count;i++){
+    renards[i].
   }
 }
 
