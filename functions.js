@@ -14,7 +14,7 @@ var frame = 0;
 var running = false;
 var visionRange = 300;
 var foxDieTime = 10000;
-var foxtodie = [];
+var foxToDie = [];
 
 var unsafeZone = {};
 var unsafeZoneId = 0;
@@ -236,9 +236,11 @@ function move() {
 }
 
 function die(){
-  for(i=0;i<foxtodie.count;i++){
-    delete renards[];
-    renards[i]
+  for(var i=0;i<foxToDie.lenght;i++){
+    delete renards[foxToDie[i]];
+  }
+  for(var i=0;i<lapinsToDie.lenght;i++){
+    delete lapins[foxToDie[i]];
   }
 }
 
