@@ -119,7 +119,7 @@ class Renard extends Animal{
     this.visionRange = visionRange;
     this.id = id;
     setTimeout(function(){
-      foxtodie.push(this.id);
+      foxtodie.push(this);
     }, dieTime);
   }
 
