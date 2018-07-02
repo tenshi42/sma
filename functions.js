@@ -1,5 +1,6 @@
 var canvasWidth = 600;
 var canvasHeight = 400;
+var imagesSizes = 35;
 var distanceMax = Math.sqrt(canvasWidth * canvasWidth + canvasHeight * canvasHeight);
 var canvas = null;
 var ctx = null;
@@ -23,6 +24,8 @@ var timeToSafe = 5;
 
 var lapinsToDie = [];
 
+var spawn = false;
+
 class Animal {
   constructor(posX, posY, image, id) {
     this.id = id;
@@ -31,8 +34,8 @@ class Animal {
     this.dirX = 0;
     this.dirY = 0;
     this.continuity = 0;
-    this.width = 35;
-    this.height = 35;
+    this.width = imagesSizes;
+    this.height = imagesSizes;
     this.img = new Image();
     this.img.src = image;
   }
@@ -196,15 +199,15 @@ class Renard extends Animal{
 }
 
 function addLapin() {
-  var x = Math.floor(Math.random() * canvasWidth);
-  var y = Math.floor(Math.random() * canvasHeight);
+  var x = Math.floor(Math.random() * (canvasWidth - imagesSizes));
+  var y = Math.floor(Math.random() * (canvasHeight - imagesSizes));
   lapins[lapinId] = new Lapin(x, y, lapinId);
   lapinId++;
 }
 
 function addRenard() {
-  var x = Math.floor(Math.random() * canvasWidth);
-  var y = Math.floor(Math.random() * canvasHeight);
+  var x = Math.floor(Math.random() * (canvasWidth - imagesSizes));
+  var y = Math.floor(Math.random() * (canvasHeight - imagesSizes));
   renards[renardId] = new Renard(x, y, visionRange, renardId);
   renardId++;
 }
@@ -251,12 +254,39 @@ function drawInterface() {
   ctx.fillRect(0,0,canvasWidth,canvasHeight);
 }
 
+function init() {
+  var nbLapinsToSpawn = parseInt(document.getElementById('lapin').value);
+  var nbRenardsToSpawn = parseInt(document.getElementById('renard').value);
+
+  console.log('init');
+
+  for(var i = 0 ; i < nbLapinsToSpawn ; i++){
+    addLapin();
+  }
+
+  for(var i = 0 ; i < nbRenardsToSpawn ; i++){
+    addRenard();
+  }
+
+  draw();
+}
+
 function run() {
   running = !running;
   if(running)
     document.getElementById('run').value = "Pause";
   else
     document.getElementById('run').value = "Run";
+}
+
+function enableSpawn(){
+  spawn = !spawn;
+  if(spawn){
+    document.getElementById('spawn').value = "Disable spawn";
+  }
+  else {
+    document.getElementById('spawn').value = "Enable spawn";
+  }
 }
 
 window.onload = function () {
@@ -271,11 +301,14 @@ window.onload = function () {
     if(!running)
       return;
     frame++;
-    move();
+    if(running)
+      move();
     draw();
-    if(frame%reproductionDelay === 0)
-      addLapin();
-    if(frame%(reproductionDelay*10) === 0)
-      addRenard();
+    if(spawn) {
+      if (frame % reproductionDelay === 0)
+        addLapin();
+      if (frame % (reproductionDelay * 10) === 0)
+        addRenard();
+    }
   }, 1000/rate);
 };
