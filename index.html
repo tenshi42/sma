@@ -1,15 +1,50 @@
 <!DOCTYPE html>
-<html lang="en">
+
+<html>
+
 <head>
     <meta charset="UTF-8">
-    <title>SMA</title>
+    <title>Renard vs Lapin !</title>
     <script src="functions.js"></script>
 </head>
 <body>
-    <canvas id="canvas" width="600" height="400">
 
-    </canvas>
-    <button onclick="addLapin()">Add lapin</button>
-    <button onclick="addRenard()">Add renard</button>
+<h1>La course du lapin pour échapper au renard...</h1>
+
+<canvas id="canvas" width="600" height="400">
+
+</canvas>
+
+<div>
+    <label for="lap_app">Fréquence d'apparition d'un lapin (en seconde) :</label>
+    <input type="number" name="lap_app" id="lap_app" min="0">
+</div>
+
+
+<div>
+    <label for="visi">Distance de visibilité où un renard voit un lapin (en millimètre) :</label>
+    <input type="number" name="visi" id="visi" min="0">
+</div>
+
+
+<div>
+    <label for="renard_mort">Durée avant la mort d'un renard par manque de nourriture (en seconde) :</label>
+    <input type="number" name="renard_mort" id="renard_mort" min="0">
+</div>
+
+
+<div>
+    <label for="lapin">Nombre initial de lapin :</label>
+    <input type="number" name="lapin" id="lapin" min="0">
+</div>
+
+
+<div>
+    <label for="renard">Nombre initial de renard :</label>
+    <input type="number" name="renard" id="renard" min="0">
+</div>
+
+<input type="button" value="Run" id="run" onclick="run()" />
+
 </body>
 </html>

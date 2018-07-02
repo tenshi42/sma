@@ -9,6 +9,9 @@ var lapinId = 0;
 var renardId = 0;
 var lapins = [];
 var renards = [];
+var reproductionDelay = 1;
+var frame = 0;
+var running = false;
 var visionRange = 300;
 
 class Animal {
@@ -186,6 +189,14 @@ function drawInterface() {
   ctx.fillRect(0,0,canvasWidth,canvasHeight);
 }
 
+function run() {
+  running = !running;
+  if(running)
+    document.getElementById('run').value = "Pause";
+  else
+    document.getElementById('run').value = "Run";
+}
+
 window.onload = function () {
   canvas = document.getElementById("canvas");
   ctx = canvas.getContext("2d");
@@ -195,7 +206,14 @@ window.onload = function () {
   ctx.height = canvasHeight;
 
   loopHandler = setInterval(function () {
+    if(!running)
+      return;
+    frame++;
     move();
     draw();
+    if(frame%reproductionDelay === 0)
+      addLapin();
+    if(frame%(reproductionDelay*10) === 0)
+      addRenard();
   }, 1000/rate);
 };
