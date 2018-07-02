@@ -27,14 +27,6 @@ class Animal {
     this.img.src = image;
   }
 
-  getPosX(){
-    return this.posX;
-  }
-
-  getPosY(){
-    return this.posY;
-  }
-
   move(){
     if(this.continuity <= 0){
       this.setDir();
@@ -94,8 +86,8 @@ class Renard extends Animal{
     var iMin = 0;
 
     for (var i in lapins){
-      var a = lapins[i].getPosX() - this.posX;
-      var b = lapins[i].getPosY() - this.posY;
+      var a = lapins[i].posX - this.posX;
+      var b = lapins[i].posY - this.posY;
 
       distances[i] = Math.sqrt(a*a + b*b);
 
