@@ -16,6 +16,13 @@ var visionRange = 300;
 var foxDieTime = 10 000;
 var foxtodie = [];
 
+var unsafeZone = {};
+var unsafeZoneId = 0;
+var unsafeRadius = 200;
+var timeToSafe = 5;
+
+var lapinsToDie = [];
+
 class Animal {
   constructor(posX, posY, image, id) {
     this.id = id;
@@ -68,8 +75,39 @@ class Animal {
 }
 
 class Lapin extends Animal{
-  constructor(posX, posY){
-    super(posX, posY, "images/lapin1.png");
+  constructor(posX, posY, id){
+    super(posX, posY, "images/lapin1.png", id);
+  }
+
+  die(){
+    unsafeZone[unsafeZoneId] = {x: this.getPosX(), y: this.getPosY()};
+    lapinsToDie.push(this.id);
+    setTimeout(function () {
+      delete unsafeZone[unsafeZoneId];
+    }, timeToSafe * 1000);
+    unsafeZoneId++;
+  }
+
+  move(){
+    this.inUnsafeZone();
+    super.move();
+  }
+
+  inUnsafeZone(){
+    var ret = true;
+
+    while(ret) {
+      ret = false;
+      for (var i in unsafeZone) {
+        if (Math.sqrt(Math.pow(unsafeZone[i].x - (this.posX + this.dirX), 2) + Math.pow(unsafeZone[i].y - (this.posY + this.dirY), 2)) < unsafeRadius) {
+          ret = true;
+        }
+      }
+      if(ret)
+        this.setDir();
+    }
+
+    return ret;
   }
 }
 
@@ -159,13 +197,15 @@ class Renard extends Animal{
 function addLapin() {
   var x = Math.floor(Math.random() * canvasWidth);
   var y = Math.floor(Math.random() * canvasHeight);
-  lapins[lapinId++] = new Lapin(x, y);
+  lapins[lapinId] = new Lapin(x, y, lapinId);
+  lapin++;
 }
 
 function addRenard() {
   var x = Math.floor(Math.random() * canvasWidth);
   var y = Math.floor(Math.random() * canvasHeight);
-  renards[renardId++] = new Renard(x, y, visionRange);
+  renards[renardId] = new Renard(x, y, visionRange, renardId);
+  renardId++;
 }
 
 function draw() {
