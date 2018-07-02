@@ -7,8 +7,8 @@ var rate = 30;
 var loopHandler = null;
 var lapinId = 0;
 var renardId = 0;
-var lapins = [];
-var renards = [];
+var lapins = {};
+var renards = {};
 var reproductionDelay = 1;
 var frame = 0;
 var running = false;
@@ -165,6 +165,7 @@ class Renard extends Animal{
    * @param i indice of Lapin in lapins[]
    */
   chaseRabbit(i) {
+    console.log(i);
     var xL = lapins[i].posX;
     var yL = lapins[i].posY;
 
@@ -223,6 +224,7 @@ function draw() {
 function move() {
   for(var i in renards){
     var y = renards[i].detectRabbit();
+    console.log(y);
     if (y !== null){
       renards[i].chaseRabbit(y[0]);
     } else {
