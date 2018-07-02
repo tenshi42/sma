@@ -237,10 +237,10 @@ function move() {
 
 function die(){
   for(var i=0;i<foxToDie.lenght;i++){
-    delete renards[foxToDie[i]];
+    delete renards[foxToDie[i]]; 
   }
   for(var i=0;i<lapinsToDie.lenght;i++){
-    delete lapins[foxToDie[i]];
+    delete lapins[lapinsToDie[i]];
   }
 }
 
