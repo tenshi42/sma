@@ -27,6 +27,14 @@ class Animal {
     this.img.src = image;
   }
 
+  getPosX(){
+    return this.posX;
+  }
+
+  getPosY(){
+    return this.posY;
+  }
+
   move(){
     if(this.continuity <= 0){
       this.setDir();
@@ -69,12 +77,12 @@ class Renard extends Animal{
     this.visionRange = visionRange;
   }
 
-    /**
-     * Get position of each rabbit,
-     * and returns nearest's indice.
-     *
-     * @returns {number}
-     */
+  /**
+   * Get position of each rabbit,
+   * and returns nearest's indice.
+   *
+   * @returns {*}
+   */
   detectRabbit(){
     /*
       var a = x1 - x2;
@@ -86,8 +94,8 @@ class Renard extends Animal{
     var iMin = 0;
 
     for (var i in lapins){
-      var a = lapins[i].posX - this.posX;
-      var b = lapins[i].posY - this.posY;
+      var a = lapins[i].getPosX - this.posX;
+      var b = lapins[i].getPosY - this.posY;
 
       distances[i] = Math.sqrt(a*a + b*b);
 
@@ -98,9 +106,9 @@ class Renard extends Animal{
     }
 
     if (distanceMin < this.visionRange){
-      return iMin;
+      return [iMin, distanceMin];
     } else {
-      return -1;
+      return null;
     }
   }
 
@@ -112,6 +120,8 @@ class Renard extends Animal{
   chaseRabbit(i) {
     var xL = lapins[i].getPosX();
     var yL = lapins[i].getPosY();
+
+    // TODO : calculate distance to avoid strange movement behavior
 
     if (xL < this.posX) {
       this.dirX = -1;
