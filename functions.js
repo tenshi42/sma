@@ -16,6 +16,7 @@ var running = false;
 var visionRange = 300;
 var foxDieTime = 10000;
 var foxToDie = [];
+var eatDistance = 10;
 
 var unsafeZone = {};
 var unsafeZoneId = 0;
@@ -77,47 +78,47 @@ class Animal {
   }
 }
 
-class Lapin extends Animal{
-  constructor(posX, posY, id){
+class Lapin extends Animal {
+  constructor(posX, posY, id) {
     super(posX, posY, "images/lapin1.png", id);
   }
 
-  die(){
-    unsafeZone[unsafeZoneId] = {x: this.getPosX(), y: this.getPosY()};
-    lapinsToDie.push(this.id);
-    setTimeout(function () {
-      delete unsafeZone[unsafeZoneId];
-    }, timeToSafe * 1000);
-    unsafeZoneId++;
+  die() {
+    if (lapinsToDie.indexOf(this.id) < 0) {
+      unsafeZone[unsafeZoneId] = {x: this.getPosX(), y: this.getPosY()};
+      lapinsToDie.push(this.id);
+      var a = unsafeZoneId;
+      setTimeout(function () {
+        delete unsafeZone[a];
+        console.log("delete : " + unsafeZoneId);
+      }, timeToSafe * 1000);
+      unsafeZoneId++;
+    }
   }
 
-  move(){
+  move() {
     this.inUnsafeZone();
     super.move();
   }
 
-  inUnsafeZone(){
-    var ret = true;
-
-    while(ret) {
-      ret = false;
-      for (var i in unsafeZone) {
-        if (Math.sqrt(Math.pow(unsafeZone[i].x - (this.posX + this.dirX), 2) + Math.pow(unsafeZone[i].y - (this.posY + this.dirY), 2)) < unsafeRadius) {
-          ret = true;
-        }
+  inUnsafeZone() {
+    for (var i in unsafeZone) {
+      var a = unsafeZone[i].x - this.posX;
+      var b = unsafeZone[i].y - this.posY;
+      var distance = Math.sqrt(Math.pow(a, 2) + Math.pow(b, 2));
+      if (distance < unsafeRadius) {
+        this.dirX = -a / distance;
+        this.dirY = -b / distance;
       }
-      if(ret)
-        this.setDir();
     }
-
-    return ret;
   }
 }
+
 
 class Renard extends Animal{
   constructor(posX, posY, visionRange, id){
     var dieTime= foxDieTime;
-    super(posX, posY, "images/renard_repro.png");
+    super(posX, posY, "images/renard1.png");
     // TODO : declare somewhere else ??
     this.visionRange = visionRange;
     this.id = id;
@@ -168,32 +169,27 @@ class Renard extends Animal{
    * @param i indice of Lapin in lapins[]
    */
   chaseRabbit(i) {
-    console.log(i);
-    var xL = lapins[i].posX;
-    var yL = lapins[i].posY;
+    var a = lapins[i].getPosX() - this.getPosX();
+    var b = lapins[i].getPosY() - this.getPosY();
 
-    // TODO : calculate distance to avoid strange movement behavior
+    var distance = Math.sqrt(a*a + b*b);
 
-    if (xL < this.posX) {
-      this.dirX = -1;
-    } else if (xL > this.posX) {
-      this.dirX = 1;
-    } else {
-      // ??
-    }
+    if(distance < eatDistance)
+      this.eat(i);
 
-    if (yL < this.posY) {
-        this.dirY = -1;
-    } else if (yL > this.posY) {
-        this.dirY = 1;
-    } else {
-      // ??
-    }
+    this.dirX = a / distance;
+    this.dirY = b / distance;
+
+
 
     // Max speed movement
     this.posX += this.dirX;
     this.posY += this.dirY;
     // TODO : ad continuity ?
+  }
+
+  eat(i){
+    lapins[i].die();
   }
 
 }
@@ -222,6 +218,8 @@ function draw() {
   for(var i in renards){
     renards[i].draw();
   }
+
+  drawUnsafeZones();
 }
 
 function move() {
@@ -241,10 +239,10 @@ function move() {
 }
 
 function die(){
-  for(var i=0;i<foxToDie.lenght;i++){
+  for(var i=0;i<foxToDie.length;i++){
     delete renards[foxToDie[i]];
   }
-  for(var i=0;i<lapinsToDie.lenght;i++){
+  for(var i=0;i<lapinsToDie.length;i++){
     delete lapins[lapinsToDie[i]];
   }
 }
@@ -252,6 +250,16 @@ function die(){
 function drawInterface() {
   ctx.fillStyle = "white";
   ctx.fillRect(0,0,canvasWidth,canvasHeight);
+}
+
+function drawUnsafeZones(){
+  ctx.fillStyle = "rgba(200, 30, 40, 0.6)";
+  for(var i in unsafeZone){
+    ctx.beginPath();
+    ctx.arc(unsafeZone[i].x, unsafeZone[i].y, unsafeRadius, 0, 2 * Math.PI);
+    ctx.fill();
+    ctx.stroke();
+  }
 }
 
 function init() {
@@ -267,6 +275,8 @@ function init() {
   for(var i = 0 ; i < nbRenardsToSpawn ; i++){
     addRenard();
   }
+
+  reproductionDelay = rate * parseInt(document.getElementById('lap_app').value);
 
   draw();
 }
@@ -301,8 +311,10 @@ window.onload = function () {
     if(!running)
       return;
     frame++;
-    if(running)
+    if(running) {
       move();
+      die();
+    }
     draw();
     if(spawn) {
       if (frame % reproductionDelay === 0)
