@@ -261,7 +261,7 @@ function die(){
 }
 
 function drawInterface() {
-  ctx.fillStyle = "white";
+//  ctx.fillStyle = "white";
   ctx.fillRect(0,0,canvasWidth,canvasHeight);
 }
 
