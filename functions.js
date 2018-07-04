@@ -309,7 +309,7 @@ function addTree() {
 function addPlane() {
   console.log("plane");
   var y = Math.floor(Math.random() * (canvasMinY - 70));
-  var x = Math.floor(Math.random() * 2) - 1;
+  var x = Math.floor(Math.random() * 200) - 100;
   planes.push(new Plane(y, x));
 }
 
@@ -456,10 +456,10 @@ function enableSpawn(){
 function enableDebugging() {
   debugging = !debugging;
   if(debugging){
-    document.getElementById('debugging').value = "Disable debugging";
+    document.getElementById('debug').value = "Disable debugging";
   }
   else {
-    document.getElementById('debugging').value = "Enable debugging";
+    document.getElementById('debug').value = "Enable debugging";
   }
 }
 
