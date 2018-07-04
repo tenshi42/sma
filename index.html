@@ -11,13 +11,28 @@
 
 <h1>La course du lapin pour échapper au renard...</h1>
 
-<canvas id="canvas" width="600" height="400">
+<table>
+    <tr>
+        <td>
+            <canvas id="canvas" width="600" height="400">
 
-</canvas>
+            </canvas>
+        </td>
+        <td style="vertical-align: top">
+            <span id="lapin_compte">
+                test
+            </span>
+            <br />
+            <span id="renard_compte">
+                test2
+            </span>
+        </td>
+    </tr>
+</table>
 
 <div>
     <label for="lap_app">Fréquence d'apparition d'un lapin (en seconde) :</label>
-    <input type="number" name="lap_app" id="lap_app" min="0" value="0.5">
+    <input type="number" name="lap_app" id="lap_app" min="0" value="0.5" step="0.1">
 </div>
 
 

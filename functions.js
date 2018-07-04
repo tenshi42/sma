@@ -263,6 +263,8 @@ function die(){
 function drawInterface() {
   ctx.fillStyle = "white";
   ctx.fillRect(0,0,canvasWidth,canvasHeight);
+  document.getElementById('lapin_compte').innerHTML = "Lapins restants : " + Object.keys(lapins).length;
+  document.getElementById('renard_compte').innerHTML = "Renards restants : " + Object.keys(renards).length;
 }
 
 function drawUnsafeZones(){
@@ -332,9 +334,9 @@ window.onload = function () {
     }
     draw();
     if(spawn) {
-      if (frame % reproductionDelay === 0)
+      if (frame % reproductionDelay === 0 && Object.keys(lapins).length > 0)
         addLapin();
-      if (frame % (reproductionDelay * 10) === 0)
+      if (frame % (reproductionDelay * 10) === 0 && Object.keys(renards).length > 0)
         addRenard();
     }
   }, 1000/rate);
