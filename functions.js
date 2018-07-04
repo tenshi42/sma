@@ -36,6 +36,8 @@ var backgroundImage = null;
 var canvasMinY = 160;
 var distanceViewRatio = 15;
 
+var planes = [];
+
 class Tree {
   constructor(posX, posY){
     this.posX = posX;
@@ -51,6 +53,41 @@ class Tree {
     this.height = size;
     this.width = size;
     ctx.drawImage(this.img, this.posX, this.posY, this.width, this.height);
+  }
+}
+
+class Plane {
+  constructor(posY, x){
+    if(x >= 0) {
+      this.posX = -20;
+      this.dirX = 2;
+    }
+    else {
+      this.posX = canvasWidth + 20;
+      this.dirX = -2;
+    }
+    this.x = x;
+    console.log(this.posX);
+    this.posY = posY;
+    this.width = imagesSizes*2;
+    this.height = imagesSizes*2;
+    this.img = new Image();
+    this.img.src = "images/a380.png";
+  }
+
+  draw() {
+    if(this.x >= 0)
+      ctx.scale(-1, 1);
+    ctx.drawImage(this.img, this.posX, this.posY, this.width, this.height);
+    if(this.x >= 0)
+      ctx.scale(-1, 1);
+  }
+
+  move() {
+    if(this.x >= 0)
+      this.posX -= this.dirX;
+    else
+      this.posX += this.dirX;
   }
 }
 
@@ -266,6 +303,13 @@ function addTree() {
   trees.push(new Tree(x, y));
 }
 
+function addPlane() {
+  console.log("plane");
+  var y = Math.floor(Math.random() * (canvasMinY - 70));
+  var x = Math.floor(Math.random() * 2) - 1;
+  planes.push(new Plane(y, x));
+}
+
 function draw() {
   drawInterface();
 
@@ -275,6 +319,10 @@ function draw() {
 
   for(var i in renards){
     renards[i].draw();
+  }
+
+  for(var i in planes){
+    planes[i].draw();
   }
 
   drawTrees();
@@ -305,6 +353,10 @@ function move() {
     lapins[i].move();
   }
   die();
+
+  for(var i in planes){
+    planes[i].move();
+  }
 }
 
 function die(){
@@ -421,6 +473,8 @@ function step(){
         addLapin();
       if (frame % (reproductionDelay * 10) === 0 && Object.keys(renards).length > 0)
         addRenard();
+      if (frame % (reproductionDelay * 10) === 0)
+        addPlane();
     }
   }
 
