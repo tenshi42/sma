@@ -11,6 +11,10 @@ var lapinId = 0;
 var renardId = 0;
 var lapins = {};
 var renards = {};
+
+var lapinsDead = 0;
+var renardsDead = 0;
+
 var reproductionDelay = 1;
 var frame = 0;
 var running = false;
@@ -310,9 +314,11 @@ function move() {
 function die(){
   for(var i=0;i<foxToDie.length;i++){
     delete renards[foxToDie[i]];
+    renardsDead++;
   }
   for(var i=0;i<lapinsToDie.length;i++){
     delete lapins[lapinsToDie[i]];
+    lapinsDead++;
   }
   foxToDie = [];
   lapinsToDie = [];
@@ -324,6 +330,8 @@ function drawInterface() {
   ctx.drawImage(backgroundImage, 0, 0, canvasWidth, canvasHeight);
   document.getElementById('lapin_compte').innerHTML = "Lapins restants : " + Object.keys(lapins).length;
   document.getElementById('renard_compte').innerHTML = "Renards restants : " + Object.keys(renards).length;
+  document.getElementById('lapin_dead').innerHTML = "Lapins morts : " + lapinsDead;
+  document.getElementById('renard_dead').innerHTML = "Renards morts : " + renardsDead;
 }
 
 function drawUnsafeZones(){
