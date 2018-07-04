@@ -59,9 +59,15 @@
     <input type="number" name="renard" id="renard" min="1" value="1">
 </div>
 
+<div>
+    <label for="vitesse">Vitesse de la simulation :</label>
+    <input type="number" name="vitesse" id="vitesse" onchange="changeSpeed(this.value)" min="1" max="10" value="1">
+</div>
+
 <input type="button" value="Init" id="init" onclick="init()" />
 <input type="button" value="Run" id="run" onclick="run()" />
 <input type="button" value="Enable spawn" id="spawn" onclick="enableSpawn()" />
+<input type="button" value="Enable debugging" id="debug" onclick="enableDebugging()" />
 
 </body>
 </html>

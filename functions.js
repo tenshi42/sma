@@ -4,6 +4,7 @@ var imagesSizes = 35;
 var distanceMax = Math.sqrt(canvasWidth * canvasWidth + canvasHeight * canvasHeight);
 var canvas = null;
 var ctx = null;
+var baseRate = 30;
 var rate = 30;
 var loopHandler = null;
 var lapinId = 0;
@@ -13,6 +14,7 @@ var renards = {};
 var reproductionDelay = 1;
 var frame = 0;
 var running = false;
+var debugging = false;
 var visionRange = 300;
 var foxDieTime = 10000;
 var foxToDie = [];
@@ -20,12 +22,37 @@ var eatDistance = 10;
 
 var unsafeZone = {};
 var unsafeZoneId = 0;
-var unsafeRadius = 200;
+var unsafeRadius = 80;
 var timeToSafe = 5;
 
 var lapinsToDie = [];
 
 var spawn = false;
+
+var trees = [];
+
+var backgroundImage = null;
+
+var canvasMinY = 160;
+var distanceViewRatio = 15;
+
+class Tree {
+  constructor(posX, posY){
+    this.posX = posX;
+    this.posY = posY;
+    this.width = imagesSizes*2;
+    this.height = imagesSizes*2;
+    this.img = new Image();
+    this.img.src = "images/tree.png";
+  }
+
+  draw() {
+    var size = imagesSizes*2 - ((1-(this.posY - canvasMinY) / (canvasHeight - canvasMinY)) * distanceViewRatio);
+    this.height = size;
+    this.width = size;
+    ctx.drawImage(this.img, this.posX, this.posY, this.width, this.height);
+  }
+}
 
 class Animal {
   constructor(posX, posY, image, id) {
@@ -39,14 +66,15 @@ class Animal {
     this.height = imagesSizes;
     this.img = new Image();
     this.img.src = image;
+    this.size = imagesSizes;
   }
 
   getPosX(){
-    return this.posX;
+    return this.posX + this.width / 2;
   }
 
   getPosY(){
-    return this.posY;
+    return this.posY + this.height / 2;
   }
 
   move(){
@@ -55,7 +83,7 @@ class Animal {
     }
     this.posX += this.dirX;
     this.posY += this.dirY;
-    if(!this.isInBox()){
+    if(!this.isInBox() || this.isTreesCollisions()){
       this.posX -= this.dirX;
       this.posY -= this.dirY;
       this.setDir();
@@ -64,6 +92,9 @@ class Animal {
   }
 
   draw() {
+    var size = this.size - ((1-(this.posY - canvasMinY) / (canvasHeight - canvasMinY)) * distanceViewRatio);
+    this.height = size;
+    this.width = size;
     ctx.drawImage(this.img, this.posX, this.posY, this.width, this.height);
   }
 
@@ -74,13 +105,22 @@ class Animal {
   }
 
   isInBox() {
-    return this.posX >= 0 && this.posX <= (canvasWidth - this.width) && this.posY >= 0 && this.posY <= (canvasHeight - this.height);
+    return this.posX >= 0 && this.posX <= (canvasWidth - this.width) && this.posY >= canvasMinY && this.posY <= (canvasHeight - this.height);
+  }
+
+  isTreesCollisions(){
+    var ret = false;
+    for(var i = 0 ; i < trees.length ; i++){
+      var col = this.posX <= trees[i].posX + (trees[i].width / 3 * 2) && this.posX + this.width >= trees[i].posX + (trees[i].width / 3) && this.posY <= trees[i].posY + trees[i].height && this.posY + this.height >= trees[i].posY + (trees[i].height / 4 * 3);
+      if(col)
+        return true;
+    }
   }
 }
 
 class Lapin extends Animal {
   constructor(posX, posY, id) {
-    super(posX, posY, "images/lapin1.png", id);
+    super(posX, posY, "images/lapin2.png", id);
   }
 
   die() {
@@ -90,7 +130,6 @@ class Lapin extends Animal {
       var a = unsafeZoneId;
       setTimeout(function () {
         delete unsafeZone[a];
-        console.log("delete : " + unsafeZoneId);
       }, timeToSafe * 1000);
       unsafeZoneId++;
     }
@@ -117,7 +156,10 @@ class Lapin extends Animal {
 
 class Renard extends Animal{
   constructor(posX, posY, visionRange, id){
-    super(posX, posY, "images/renard1.png", id);
+    super(posX, posY, "images/renard2.png", id);
+    this.width*=2;
+    this.height*=2;
+    this.size*=2;
     // TODO : declare somewhere else ??
     this.visionRange = visionRange;
     var _id = id;
@@ -194,23 +236,34 @@ class Renard extends Animal{
     this.handler = setTimeout(function(){
       foxToDie.push(_id);
     }, foxDieTime);
-    console.log("new : fox die time : " + foxDieTime);
   }
 
 }
 
 function addLapin() {
-  var x = Math.floor(Math.random() * (canvasWidth - imagesSizes));
-  var y = Math.floor(Math.random() * (canvasHeight - imagesSizes));
-  lapins[lapinId] = new Lapin(x, y, lapinId);
+  var notOk = true;
+  while(notOk) {
+    notOk = false;
+    var x = Math.floor(Math.random() * (canvasWidth - imagesSizes));
+    var y = Math.floor(Math.random() * (canvasHeight - imagesSizes - canvasMinY)) + canvasMinY;
+    lapins[lapinId] = new Lapin(x, y, lapinId);
+    if(lapins[lapinId].isTreesCollisions())
+      notOk = true;
+  }
   lapinId++;
 }
 
 function addRenard() {
   var x = Math.floor(Math.random() * (canvasWidth - imagesSizes));
-  var y = Math.floor(Math.random() * (canvasHeight - imagesSizes));
+  var y = Math.floor(Math.random() * (canvasHeight - imagesSizes - canvasMinY)) + canvasMinY;
   renards[renardId] = new Renard(x, y, visionRange, renardId);
   renardId++;
+}
+
+function addTree() {
+  var x = Math.floor(Math.random() * (canvasWidth - imagesSizes*2));
+  var y = Math.floor(Math.random() * (canvasHeight - imagesSizes*2 - canvasMinY)) + canvasMinY;
+  trees.push(new Tree(x, y));
 }
 
 function draw() {
@@ -224,7 +277,12 @@ function draw() {
     renards[i].draw();
   }
 
-  drawUnsafeZones();
+  drawTrees();
+
+  if(debugging) {
+    drawUnsafeZones();
+    debugDrawTree();
+  }
 }
 
 function drawDebug() {
@@ -262,7 +320,8 @@ function die(){
 
 function drawInterface() {
 //  ctx.fillStyle = "white";
-  ctx.fillRect(0,0,canvasWidth,canvasHeight);
+  //ctx.fillRect(0,0,canvasWidth,canvasHeight);
+  ctx.drawImage(backgroundImage, 0, 0, canvasWidth, canvasHeight);
   document.getElementById('lapin_compte').innerHTML = "Lapins restants : " + Object.keys(lapins).length;
   document.getElementById('renard_compte').innerHTML = "Renards restants : " + Object.keys(renards).length;
 }
@@ -274,6 +333,20 @@ function drawUnsafeZones(){
     ctx.arc(unsafeZone[i].x, unsafeZone[i].y, unsafeRadius, 0, 2 * Math.PI);
     ctx.fill();
     ctx.stroke();
+  }
+}
+
+function drawTrees() {
+  for(var i in trees){
+    trees[i].draw();
+  }
+}
+
+function debugDrawTree() {
+  for(var i in trees){
+    ctx.beginPath();
+    ctx.fillStyle = "rgba(25, 45, 200, 0.7)";
+    ctx.fillRect(trees[i].posX + (trees[i].width / 3), trees[i].posY + (trees[i].height / 4 * 3), (trees[i].width / 3), trees[i].height / 4)
   }
 }
 
@@ -296,10 +369,17 @@ function init() {
   draw();
 }
 
+function initTrees() {
+  for(var i = 0 ; i < 10 ; i++){
+    addTree();
+  }
+}
+
 function run() {
   running = !running;
-  if(running)
+  if(running) {
     document.getElementById('run').value = "Pause";
+  }
   else
     document.getElementById('run').value = "Run";
 }
@@ -314,6 +394,41 @@ function enableSpawn(){
   }
 }
 
+function enableDebugging() {
+  debugging = !debugging;
+  if(debugging){
+    document.getElementById('debugging').value = "Disable debugging";
+  }
+  else {
+    document.getElementById('debugging').value = "Enable debugging";
+  }
+}
+
+function changeSpeed(val) {
+  rate = baseRate * val;
+}
+
+function step(){
+  if(running) {
+    frame++;
+    if (running) {
+      move();
+      die();
+    }
+    draw();
+    if (spawn) {
+      if (frame % reproductionDelay === 0 && Object.keys(lapins).length > 0)
+        addLapin();
+      if (frame % (reproductionDelay * 10) === 0 && Object.keys(renards).length > 0)
+        addRenard();
+    }
+  }
+
+  setTimeout(function () {
+    step();
+  }, 1000/rate);
+}
+
 window.onload = function () {
   canvas = document.getElementById("canvas");
   ctx = canvas.getContext("2d");
@@ -322,22 +437,10 @@ window.onload = function () {
   ctx.width = canvasWidth;
   ctx.height = canvasHeight;
 
-  drawDebug();
+  initTrees();
 
-  loopHandler = setInterval(function () {
-    if(!running)
-      return;
-    frame++;
-    if(running) {
-      move();
-      die();
-    }
-    draw();
-    if(spawn) {
-      if (frame % reproductionDelay === 0 && Object.keys(lapins).length > 0)
-        addLapin();
-      if (frame % (reproductionDelay * 10) === 0 && Object.keys(renards).length > 0)
-        addRenard();
-    }
-  }, 1000/rate);
+  backgroundImage = new Image();
+  backgroundImage.src = "images/herbe2.jpg";
+
+  step();
 };
