@@ -201,7 +201,7 @@ class Renard extends Animal{
     this.width*=2;
     this.height*=2;
     this.size*=2;
-    // TODO : declare somewhere else ??
+
     this.visionRange = visionRange;
     var _id = id;
     this.handler = setTimeout(function(){
@@ -267,7 +267,6 @@ class Renard extends Animal{
     // Max speed movement
     this.posX += this.dirX;
     this.posY += this.dirY;
-    // TODO : ad continuity ?
   }
 
   eat(i){
