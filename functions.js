@@ -117,14 +117,13 @@ class Lapin extends Animal {
 
 class Renard extends Animal{
   constructor(posX, posY, visionRange, id){
-    var dieTime= foxDieTime;
-    super(posX, posY, "images/renard1.png");
+    super(posX, posY, "images/renard1.png", id);
     // TODO : declare somewhere else ??
     this.visionRange = visionRange;
-    this.id = id;
-    setTimeout(function(){
-      foxToDie.push(this.id);
-    }, dieTime);
+    var _id = id;
+    this.handler = setTimeout(function(){
+      foxToDie.push(_id);
+    }, foxDieTime);
   }
 
   /**
@@ -190,6 +189,10 @@ class Renard extends Animal{
 
   eat(i){
     lapins[i].die();
+    clearTimeout(this.handler);
+    this.handler = setTimeout(function(){
+      foxToDie.push(this.id);
+    }, foxDieTime);
   }
 
 }
@@ -245,6 +248,8 @@ function die(){
   for(var i=0;i<lapinsToDie.length;i++){
     delete lapins[lapinsToDie[i]];
   }
+  foxToDie = [];
+  lapinsToDie = [];
 }
 
 function drawInterface() {
@@ -277,6 +282,8 @@ function init() {
   }
 
   reproductionDelay = rate * parseInt(document.getElementById('lap_app').value);
+
+  foxDieTime = parseInt(document.getElementById('renard_mort').value);
 
   draw();
 }
