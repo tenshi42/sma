@@ -74,7 +74,7 @@ class Animal {
   }
 
   isInBox() {
-    return this.posX >= 0 && this.posX <= canvasWidth - this.width && this.posY >= 0 && this.posY <= canvasWidth - this.height;
+    return this.posX >= 0 && this.posX <= (canvasWidth - this.width) && this.posY >= 0 && this.posY <= (canvasHeight - this.height);
   }
 }
 
@@ -190,9 +190,11 @@ class Renard extends Animal{
   eat(i){
     lapins[i].die();
     clearTimeout(this.handler);
+    var _id = this.id;
     this.handler = setTimeout(function(){
-      foxToDie.push(this.id);
+      foxToDie.push(_id);
     }, foxDieTime);
+    console.log("new : fox die time : " + foxDieTime);
   }
 
 }
@@ -223,6 +225,12 @@ function draw() {
   }
 
   drawUnsafeZones();
+}
+
+function drawDebug() {
+  ctx.beginPath();
+  ctx.arc(canvasWidth, canvasHeight, 30, 0, 2 * Math.PI);
+  ctx.stroke();
 }
 
 function move() {
@@ -270,6 +278,8 @@ function drawUnsafeZones(){
 function init() {
   var nbLapinsToSpawn = parseInt(document.getElementById('lapin').value);
   var nbRenardsToSpawn = parseInt(document.getElementById('renard').value);
+  reproductionDelay = parseFloat(document.getElementById('lap_app').value) * rate;
+  foxDieTime = parseFloat(document.getElementById('renard_mort').value) * 1000;
 
   console.log('init');
 
@@ -280,10 +290,6 @@ function init() {
   for(var i = 0 ; i < nbRenardsToSpawn ; i++){
     addRenard();
   }
-
-  reproductionDelay = rate * parseInt(document.getElementById('lap_app').value);
-
-  foxDieTime = parseInt(document.getElementById('renard_mort').value);
 
   draw();
 }
@@ -313,6 +319,8 @@ window.onload = function () {
   console.log("Ready !");
   ctx.width = canvasWidth;
   ctx.height = canvasHeight;
+
+  drawDebug();
 
   loopHandler = setInterval(function () {
     if(!running)
