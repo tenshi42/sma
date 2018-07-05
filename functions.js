@@ -43,6 +43,7 @@ var distanceViewRatio = 15;
 var planes = [];
 var meteors = [];
 var meteorSpeed = 4;
+var meteorImpactPoint = canvasHeight /3;
 
 class Tree {
   constructor(posX, posY){
@@ -67,7 +68,7 @@ class Meteor {
     this.posX = canvasWidth / 2;
     this.posY = 0;
     this.dirY = speed;
-    this.width = imagesSizes;
+    this.width = imagesSizes / 3;
     this.height = imagesSizes;
     this.img = new Image();
     this.img.src = "images/meteor.png";
@@ -79,8 +80,14 @@ class Meteor {
   }
 
   move() {
-    this.posY += this.dirY;
-    // TODO : interrupt movement for impact.
+    //while (this.posY < meteorImpactPoint){
+      this.posY += this.dirY;
+    //}
+    if(this.posY > meteorImpactPoint){
+      console.log("Impact !");
+      this.dirY = 0;
+      // TODO : destruct meteor.
+    }
   }
 
   impact() {
