@@ -41,6 +41,8 @@ var canvasMinY = 160;
 var distanceViewRatio = 15;
 
 var planes = [];
+var meteors = [];
+var meteorSpeed = 4;
 
 class Tree {
   constructor(posX, posY){
@@ -60,6 +62,32 @@ class Tree {
   }
 }
 
+class Meteor {
+  constructor(speed) {
+    this.posX = canvasWidth / 2;
+    this.posY = 0;
+    this.dirY = speed;
+    this.width = imagesSizes;
+    this.height = imagesSizes;
+    this.img = new Image();
+    this.img.src = "images/meteor.png";
+    // TODO : modify image
+  }
+
+  draw() {
+    ctx.drawImage(this.img, this.posX, this.posY, this.width, this.height);
+  }
+
+  move() {
+    this.posY += this.dirY;
+    // TODO : interrupt movement for impact.
+  }
+
+  impact() {
+    // TODO
+  }
+}
+
 class Plane {
   constructor(posY, x){
     if(x >= 0) {
@@ -71,7 +99,6 @@ class Plane {
       this.dirX = -2;
     }
     this.x = x;
-    console.log(this.posX);
     this.posY = posY;
     this.width = imagesSizes*2;
     this.height = imagesSizes*2;
@@ -307,10 +334,13 @@ function addTree() {
 }
 
 function addPlane() {
-  console.log("plane");
   var y = Math.floor(Math.random() * (canvasMinY - 70));
   var x = Math.floor(Math.random() * 200) - 100;
   planes.push(new Plane(y, x));
+}
+
+function armageddon() {
+  meteors.push(new Meteor(meteorSpeed));
 }
 
 function draw() {
@@ -327,6 +357,10 @@ function draw() {
   for(var i in planes){
     planes[i].draw();
   }
+
+    for(var i in meteors){
+        meteors[i].draw();
+    }
 
   drawTrees();
 
@@ -359,6 +393,10 @@ function move() {
 
   for(var i in planes){
     planes[i].move();
+  }
+
+  for(var i in meteors){
+    meteors[i].move();
   }
 }
 
