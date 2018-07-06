@@ -37,20 +37,26 @@ var trees = [];
 
 var backgroundImage = null;
 
-var canvasMinY = 160;
+var canvasMinY = null;
+var canvasMaxY = null;
 var distanceViewRatio = 15;
 
-var planes = [];
+var planes = {};
+var planeId = 0;
 var meteors = [];
 var meteorSpeed = 4;
 var meteorImpactPoint = canvasMinY;
+
+var isControlBoxOpen = true;
+
+var planesToDelete = [];
 
 function addLapin() {
   var notOk = true;
   while(notOk) {
     notOk = false;
     var x = Math.floor(Math.random() * (canvasWidth - imagesSizes));
-    var y = Math.floor(Math.random() * (canvasHeight - imagesSizes - canvasMinY)) + canvasMinY;
+    var y = Math.floor(Math.random() * (canvasMaxY - imagesSizes - canvasMinY)) + canvasMinY;
     lapins[lapinId] = new Lapin(x, y, lapinId);
     if(lapins[lapinId].isTreesCollisions())
       notOk = true;
@@ -60,21 +66,22 @@ function addLapin() {
 
 function addRenard() {
   var x = Math.floor(Math.random() * (canvasWidth - imagesSizes));
-  var y = Math.floor(Math.random() * (canvasHeight - imagesSizes - canvasMinY)) + canvasMinY;
+  var y = Math.floor(Math.random() * (canvasMaxY - imagesSizes - canvasMinY)) + canvasMinY;
   renards[renardId] = new Renard(x, y, visionRange, renardId);
   renardId++;
 }
 
 function addTree() {
   var x = Math.floor(Math.random() * (canvasWidth - imagesSizes*2));
-  var y = Math.floor(Math.random() * (canvasHeight - imagesSizes*2 - canvasMinY)) + canvasMinY;
+  var y = Math.floor(Math.random() * (canvasMaxY - imagesSizes*2 - canvasMinY)) + canvasMinY;
   trees.push(new Tree(x, y));
 }
 
 function addPlane() {
   var y = Math.floor(Math.random() * (canvasMinY - 70));
   var x = Math.floor(Math.random() * 200) - 100;
-  planes.push(new Plane(y, x));
+  planes[planeId] = new Plane(y, x, planeId);
+  planeId++;
 }
 
 function armageddon() {
@@ -105,6 +112,7 @@ function draw() {
   if(debugging) {
     drawUnsafeZones();
     debugDrawTree();
+    debugDrawPlanes();
   }
 }
 
@@ -147,8 +155,12 @@ function die(){
     delete lapins[lapinsToDie[i]];
     lapinsDead++;
   }
+  for(var i=0;i<planesToDelete.length;i++){
+    delete planes[planesToDelete[i]];
+  }
   foxToDie = [];
   lapinsToDie = [];
+  planesToDelete = [];
 }
 
 function drawInterface() {
@@ -185,6 +197,15 @@ function debugDrawTree() {
   }
 }
 
+function debugDrawPlanes() {
+  for(var i in planes){
+    ctx.beginPath();
+    ctx.fillStyle = "rgba(25, 45, 200, 0.7)";
+    ctx.fillRect(planes[i].posX, planes[i].posY, planes[i].width, planes[i].height)
+  }
+
+}
+
 function init() {
   var nbLapinsToSpawn = parseInt(document.getElementById('lapin').value);
   var nbRenardsToSpawn = parseInt(document.getElementById('renard').value);
@@ -212,11 +233,17 @@ function initTrees() {
 
 function run() {
   running = !running;
+
+  for(var i in renards){
+    renards[i].pauseTimer(!running);
+  }
+
   if(running) {
     document.getElementById('run').value = "Pause";
   }
-  else
+  else {
     document.getElementById('run').value = "Run";
+  }
 }
 
 function enableSpawn(){
@@ -256,7 +283,7 @@ function step(){
         addLapin();
       if (frame % (reproductionDelay * 10) === 0 && Object.keys(renards).length > 0)
         addRenard();
-      if (frame % 1 === 0)
+      if (frame % (reproductionDelay * 10) === 0)
         addPlane();
     }
   }
@@ -266,9 +293,48 @@ function step(){
   }, 1000/rate);
 }
 
+function openControlBox(){
+  isControlBoxOpen = !isControlBoxOpen;
+
+  if(isControlBoxOpen){
+    document.getElementById("controls-box-trigger").innerHTML = "Close";
+    //document.getElementById("controls-box-sub").style.height = "160px";
+    document.getElementById("controls-box").style.height = "175px";
+  }
+  else {
+    document.getElementById("controls-box-trigger").innerHTML = "Open";
+    //document.getElementById("controls-box-sub").style.height = "0";
+    document.getElementById("controls-box").style.height = "25px";
+  }
+}
+
 window.onload = function () {
   canvas = document.getElementById("canvas");
+  canvasWidth = canvas.width = window.innerWidth * 0.8;
+  canvasHeight = canvas.height = window.innerHeight * 0.8;
   ctx = canvas.getContext("2d");
+
+  var table = document.getElementsByTagName("table")[0];
+  console.log((window.innerHeight - (table.offsetTop + table.offsetHeight)));
+  document.getElementById("controls-box").style.bottom = (window.innerHeight - (table.offsetTop + table.offsetHeight) + 6) + "px";
+  document.getElementById("controls-box").style.width = (window.innerWidth * 0.8) + "px";
+
+  canvasMinY = canvasHeight * 0.4;
+  canvasMaxY = canvasHeight - 25;
+
+  /*try {
+    canvas.webkitRequestFullscreen(Element.ALLOW_KEYBOARD_INPUT);
+  }
+  catch (e){
+    console.log("nok : " + e);
+  }
+
+  try {
+    canvas.mozRequestFullScreen();
+  }
+  catch (e){
+    console.log("nok : " + e);
+  }*/
 
   console.log("Ready !");
   ctx.width = canvasWidth;

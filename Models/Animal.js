@@ -49,7 +49,7 @@ class Animal {
   }
 
   isInBox() {
-    return this.posX >= 0 && this.posX <= (canvasWidth - this.width) && this.posY >= canvasMinY && this.posY <= (canvasHeight - this.height);
+    return this.posX >= 0 && this.posX <= (canvasWidth - this.width) && this.posY >= canvasMinY && this.posY <= (canvasMaxY - this.height);
   }
 
   isTreesCollisions(){

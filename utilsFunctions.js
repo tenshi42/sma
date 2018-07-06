@@ -1,20 +1,24 @@
 function timer(callback, delay) {
-  var id, started, remaining = delay, running;
+  var id, started, remaining = delay, _running;
 
   this.start = function() {
-    running = true;
+    _running = true;
     started = new Date();
     id = setTimeout(callback, remaining);
   };
 
+  this.setRemainingTime = function (delay) {
+    remaining = delay;
+  };
+
   this.pause = function() {
-    running = false;
+    _running = false;
     clearTimeout(id);
     remaining -= new Date() - started;
   };
 
   this.getTimeLeft = function() {
-    if (running) {
+    if (_running) {
       this.pause();
       this.start();
     }
@@ -23,7 +27,7 @@ function timer(callback, delay) {
   };
 
   this.getStateRunning = function() {
-    return running;
+    return _running;
   };
 
   this.start();

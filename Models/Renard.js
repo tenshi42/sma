@@ -7,7 +7,7 @@ class Renard extends Animal{
 
     this.visionRange = visionRange;
     var _id = id;
-    this.handler = setTimeout(function(){
+    this.handler = new timer(function(){
       foxToDie.push(_id);
     }, foxDieTime);
   }
@@ -74,11 +74,17 @@ class Renard extends Animal{
 
   eat(i){
     lapins[i].die();
-    clearTimeout(this.handler);
-    var _id = this.id;
-    this.handler = setTimeout(function(){
-      foxToDie.push(_id);
-    }, foxDieTime);
+    this.handler.pause()
+    this.handler.setRemainingTime(foxDieTime);
+    this.handler.start();
   }
 
+  pauseTimer(pause){
+    if(pause){
+      this.handler.pause();
+    }
+    else{
+      this.handler.start();
+    }
+  }
 }
